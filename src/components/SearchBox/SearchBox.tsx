@@ -1,5 +1,8 @@
 import React from 'react';
-import css from './SearchBox.module.css';
+
+// Імпортуємо стилі та безпечно типізуємо для ESLint/TypeScript
+import cssStyles from './SearchBox.module.css';
+const css = cssStyles as Record<string, string>;
 
 interface SearchBoxProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

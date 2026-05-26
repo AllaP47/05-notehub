@@ -42,13 +42,13 @@ export default function App() {
 
 
   const createMutation = useMutation({
-    mutationFn: (newNote: { title: string; text: string; tags: string[] }) =>
-      createNote(newNote),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      setIsModalOpen(false);
-    },
-  });
+  mutationFn: (newNote: { title: string; text: string; tags: string[] }) =>
+    createNote(newNote), // Сервіс тепер отримає правильний масив рядків
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['notes'] });
+    setIsModalOpen(false);
+  },
+});
 
   
   const deleteMutation = useMutation({
@@ -58,13 +58,19 @@ export default function App() {
     },
   });
 
- const handleCreateSubmit = (values: { title: string; content: string; tag: string }) => {
+const handleCreateSubmit = (values: { title: string; content: string; tag: string }) => {
   createMutation.mutate({
-    title: values.title,
-    text: values.content,
-    tags: [], 
+    title: values.title, // Передаємо заголовок нотатки
+    
+    // ВАЖЛИВО: Переносимо значення з форми `content` у поле `text`, яке вимагає бекенд
+    text: values.content, 
+    
+    // ВАЖЛИВО: Бекенд приймає назви тегів виключно в нижньому регістрі (lowercase)
+    tags: [values.tag.toLowerCase()], 
   });
 };
+
+
 
 
   return (

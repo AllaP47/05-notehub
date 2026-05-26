@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import css from './Modal.module.css';
+
+// Імпортуємо стилі та безпечно типізуємо для ESLint/TypeScript
+import cssStyles from './Modal.module.css';
+const css = cssStyles as Record<string, string>;
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
 }
-
 
 const modalRoot = document.getElementById('modal-root') || document.body;
 
@@ -29,7 +31,6 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
-
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {

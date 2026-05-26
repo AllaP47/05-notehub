@@ -1,8 +1,10 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import css from './NoteForm.module.css';
 
+// Імпортуємо стилі та безпечно типізуємо для ESLint/TypeScript
+import cssStyles from './NoteForm.module.css';
+const css = cssStyles as Record<string, string>;
 
 const NoteSchema = Yup.object().shape({
   title: Yup.string()

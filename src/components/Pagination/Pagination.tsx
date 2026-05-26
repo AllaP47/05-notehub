@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactPaginateModule from 'react-paginate';
-import css from './Pagination.module.css';
+
+// Імпортуємо стилі та безпечно типізуємо для ESLint/TypeScript
+import cssStyles from './Pagination.module.css';
+const css = cssStyles as Record<string, string>;
 
 // @ts-expect-error - для сумісності з різними конфігураціями ESM/CJS
 const ReactPaginate = (ReactPaginateModule.default || ReactPaginateModule) as unknown as React.ComponentType<Record<string, unknown>>;
-
 
 interface PaginationProps {
   currentPage: number;
