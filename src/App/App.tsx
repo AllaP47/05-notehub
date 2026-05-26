@@ -43,7 +43,7 @@ export default function App() {
 
   const createMutation = useMutation({
   mutationFn: (newNote: { title: string; text: string; tags: string[] }) =>
-    createNote(newNote), // Сервіс тепер отримає правильний масив рядків
+    createNote(newNote), 
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['notes'] });
     setIsModalOpen(false);
@@ -60,12 +60,11 @@ export default function App() {
 
 const handleCreateSubmit = (values: { title: string; content: string; tag: string }) => {
   createMutation.mutate({
-    title: values.title, // Передаємо заголовок нотатки
+    title: values.title, 
     
-    // ВАЖЛИВО: Переносимо значення з форми `content` у поле `text`, яке вимагає бекенд
+    
     text: values.content, 
-    
-    // ВАЖЛИВО: Бекенд приймає назви тегів виключно в нижньому регістрі (lowercase)
+
     tags: [values.tag.toLowerCase()], 
   });
 };

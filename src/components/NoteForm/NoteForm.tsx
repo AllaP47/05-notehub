@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
-// Імпортуємо стилі та безпечно типізуємо для ESLint/TypeScript
+
 import cssStyles from './NoteForm.module.css';
 const css = cssStyles as Record<string, string>;
 

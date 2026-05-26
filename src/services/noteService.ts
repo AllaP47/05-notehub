@@ -30,7 +30,7 @@ export interface FetchNotesResponse {
 export interface CreateNoteData {
   title: string;
   text: string;
-  tags?: string[]; // Робимо поле необов'язковим (додаємо знак ?)
+  tags?: string[];
 }
 export const fetchNotes = async (
   params: FetchNotesParams = {},

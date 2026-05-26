@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactPaginateModule from 'react-paginate';
 
-// Імпортуємо стилі та безпечно типізуємо для ESLint/TypeScript
+
 import cssStyles from './Pagination.module.css';
 const css = cssStyles as Record<string, string>;
 

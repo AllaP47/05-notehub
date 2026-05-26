@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-// Імпортуємо стилі та безпечно типізуємо для ESLint/TypeScript
+
 import cssStyles from './Modal.module.css';
 const css = cssStyles as Record<string, string>;
 
