@@ -1,7 +1,9 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createNote } from '../../services/noteService';
+import type { NoteTagType } from '../../types/note';
 
 import cssStyles from './NoteForm.module.css';
 const css = cssStyles as Record<string, string>;
@@ -24,12 +26,23 @@ interface NoteFormValues {
   tag: string;
 }
 
+// ВИПРАВЛЕНО: Інтерфейс тепер чітко очікує onClose відповідно до App.tsx
 interface NoteFormProps {
-  onSubmit: (values: NoteFormValues) => void;
-  onCancel: () => void;
+  onClose: () => void;
 }
 
-export const NoteForm: React.FC<NoteFormProps> = ({ onSubmit, onCancel }) => {
+export const NoteForm: React.FC<NoteFormProps> = ({ onClose }) => {
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: (newNote: { title: string; content: string; tag: NoteTagType }) =>
+      createNote(newNote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      onClose(); // Закриваємо модалку після успішного створення
+    },
+  });
+
   const initialValues: NoteFormValues = {
     title: '',
     content: '',
@@ -41,7 +54,11 @@ export const NoteForm: React.FC<NoteFormProps> = ({ onSubmit, onCancel }) => {
       initialValues={initialValues}
       validationSchema={NoteSchema}
       onSubmit={(values) => {
-        onSubmit(values);
+        createMutation.mutate({
+          title: values.title,
+          content: values.content,
+          tag: values.tag as NoteTagType,
+        });
       }}
     >
       {({ isSubmitting }) => (
@@ -77,15 +94,16 @@ export const NoteForm: React.FC<NoteFormProps> = ({ onSubmit, onCancel }) => {
           </div>
 
           <div className={css.actions}>
-            <button type="button" className={css.cancelButton} onClick={onCancel}>
+            {/* Кнопка Cancel тепер також тригерить onClose для безпечного закриття */}
+            <button type="button" className={css.cancelButton} onClick={onClose}>
               Cancel
             </button>
             <button
               type="submit"
               className={css.submitButton}
-              disabled={isSubmitting}
+              disabled={isSubmitting || createMutation.isPending}
             >
-              Create note
+              {createMutation.isPending ? 'Creating...' : 'Create note'}
             </button>
           </div>
         </Form>

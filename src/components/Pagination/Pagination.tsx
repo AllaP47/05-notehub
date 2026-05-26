@@ -1,12 +1,18 @@
 import React from 'react';
-import ReactPaginateModule from 'react-paginate';
+import type { ComponentType } from "react";
+import ReactPaginateModule from "react-paginate";
+import type { ReactPaginateProps } from "react-paginate";
 
-
+// Наш імпорт стилів із безпечною типізацією для ESLint
 import cssStyles from './Pagination.module.css';
 const css = cssStyles as Record<string, string>;
 
-// @ts-expect-error - для сумісності з різними конфігураціями ESM/CJS
-const ReactPaginate = (ReactPaginateModule.default || ReactPaginateModule) as unknown as React.ComponentType<Record<string, unknown>>;
+// Фінальний boilerplate для сумісності з Vite 8.x.x згідно з вимогами ментора
+type ModuleWithDefault<T> = { default: T };
+
+const ReactPaginate = (
+  ReactPaginateModule as unknown as ModuleWithDefault<ComponentType<ReactPaginateProps>>
+).default;
 
 interface PaginationProps {
   currentPage: number;
@@ -19,6 +25,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
+  // Виправлено: умовний рендеринг — повертаємо null, якщо кількість сторінок <= 1
   if (totalPages <= 1) return null;
 
   const handlePageClick = (event: { selected: number }) => {
@@ -49,5 +56,6 @@ export const Pagination: React.FC<PaginationProps> = ({
     />
   );
 };
+
 
 

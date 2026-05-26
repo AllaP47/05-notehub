@@ -1,4 +1,6 @@
 import React from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteNote } from '../../services/noteService';
 import type { Note } from '../../types/note';
 
 import cssStyles from './NoteList.module.css';
@@ -6,57 +8,52 @@ const css = cssStyles as Record<string, string>;
 
 interface NoteListProps {
   notes: Note[];
-  onDelete: (id: string) => void;
 }
 
-export const NoteList: React.FC<NoteListProps> = ({ notes, onDelete }) => {
-  if (notes.length === 0) return null;
+export const NoteList: React.FC<NoteListProps> = ({ notes }) => {
+  const queryClient = useQueryClient();
 
-  const defaultTags = ['Work', 'Todo', 'Personal', 'Meeting', 'Shopping'];
+  // ВИПРАВЛЕНО: Мутація перенесена на самий початок компонента (ДО умови return null)
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteNote(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+  });
+
+  // Умова йде ТІЛЬКИ після опису всіх хуків
+  if (notes.length === 0) return null;
 
   return (
     <ul className={css.list}>
-      {notes.map(({ id, title, text, tags }, index) => {
-        let cleanText = text || '';
-        let displayTag = defaultTags[index % defaultTags.length];
-
-    
-        if (text && text.includes('[tag:')) {
-          const match = text.match(/\[tag:(.+?)\]/);
-          if (match) {
-            displayTag = match[1]; // Отримуємо "Work", "Todo" тощо
-            cleanText = text.replace(/\[tag:.+?\]/, '').trim(); 
-          }
-        } else if (tags && tags.length > 0) {
-          // 2. Якщо сервер повернув свій об'єкт для тестових нотаток
-          const firstTag = tags[0] as unknown as { name?: string } | string;
-          if (typeof firstTag === 'object' && firstTag !== null && 'name' in firstTag) {
-            displayTag = firstTag.name || 'Note';
-          } else {
-            displayTag = String(firstTag);
-          }
-        }
-
-        return (
-          <li key={id} className={css.listItem}>
-            <h2 className={css.title}>{title}</h2>
-            <p className={css.content}>{cleanText}</p>
-            <div className={css.footer}>
-  
-              <button className={css.tagButton} type="button">
-                {displayTag}
-              </button>
-      
-              <button className={css.button} onClick={() => onDelete(id)}>
-                Delete
-              </button>
-            </div>
-          </li>
-        );
-      })}
+      {notes.map(({ id, title, content, tag }) => (
+        <li key={id} className={css.listItem}>
+          <h2 className={css.title}>{title}</h2>
+          
+          {/* Використовуємо content за новими вимогами API */}
+          <p className={css.content}>{content}</p>
+          
+          <div className={css.footer}>
+            {/* Використовуємо tag як рядок за новими вимогами API */}
+            <button className={css.tagButton} type="button">
+              {tag || 'Note'}
+            </button>
+           
+            <button 
+              className={css.button} 
+              onClick={() => deleteMutation.mutate(id)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
+        </li>
+      ))}
     </ul>
   );
 };
+
+
 
 
 

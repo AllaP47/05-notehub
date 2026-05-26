@@ -1,18 +1,6 @@
 import axios from "axios";
-import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import type { AxiosResponse } from "axios";
 import type { Note } from "../types/note";
-
-const noteApi = axios.create({
-  baseURL: "https://notehub-public.goit.study/api",
-});
-
-noteApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = import.meta.env.VITE_NOTEHUB_TOKEN;
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 export interface FetchNotesParams {
   page?: number;
@@ -22,34 +10,60 @@ export interface FetchNotesParams {
 
 export interface FetchNotesResponse {
   notes: Note[];
-  totalNotes: number;
   totalPages: number;
-  currentPage: number;
 }
 
 export interface CreateNoteData {
   title: string;
-  text: string;
-  tags?: string[];
+  content: string;
+  tag: string;
 }
+
+// 1. Отримання нотаток (Рядок 30) — ВИПРАВЛЕНО НА ПРАВИЛЬНИЙ URL NoteHub
 export const fetchNotes = async (
   params: FetchNotesParams = {},
 ): Promise<FetchNotesResponse> => {
-  const response: AxiosResponse<FetchNotesResponse> = await noteApi.get(
-    "/notes",
+  const token = import.meta.env.VITE_NOTEHUB_TOKEN;
+
+  const response: AxiosResponse<FetchNotesResponse> = await axios.get(
+    "https://goit.study",
     {
       params,
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     },
   );
   return response.data;
 };
 
+// 2. Створення нотатки (Рядок 45) — ВИПРАВЛЕНО НА ПРАВИЛЬНИЙ URL NoteHub
 export const createNote = async (noteData: CreateNoteData): Promise<Note> => {
-  const response: AxiosResponse<Note> = await noteApi.post("/notes", noteData);
+  const token = import.meta.env.VITE_NOTEHUB_TOKEN;
+
+  const response: AxiosResponse<Note> = await axios.post(
+    "https://goit.study",
+    noteData,
+    {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    },
+  );
   return response.data;
 };
 
-export const deleteNote = async (id: string): Promise<{ success: boolean }> => {
-  const response = await noteApi.delete(`/notes/${id}`);
+// 3. Видалення нотатки (Рядок 60) — ВИПРАВЛЕНО НА ПРАВИЛЬНИЙ URL NoteHub
+export const deleteNote = async (id: string): Promise<Note> => {
+  const token = import.meta.env.VITE_NOTEHUB_TOKEN;
+
+  const response: AxiosResponse<Note> = await axios.delete(
+    `https://goit.study/${id}`,
+    {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    },
+  );
   return response.data;
 };
